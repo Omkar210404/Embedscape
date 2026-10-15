@@ -1,0 +1,21 @@
+# Node / build
+node_modules/
+dist/
+test-results/
+playwright-report/
+*.tsbuildinfo
+
+# Python pipeline
+pipeline/.venv/
+pipeline/.cache/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Local / editor
+.env
+.env.*
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
