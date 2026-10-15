@@ -240,8 +240,9 @@ Run `npx playwright install chromium` once before the browser tests.
 
 [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) runs all three test suites on every push
 and pull request. On `main`, it then builds and deploys `dist/` to GitHub Pages. To enable it, go to
-**Settings → Pages → Source: GitHub Actions**. The site expects to be served from `/embedscape/`; set
-`BASE_PATH=/` when building for a different host.
+**Settings → Pages → Source: GitHub Actions**. The workflow builds the site for the repository's own
+path (for example `/Embedscape/`). Local builds default to `/embedscape/`; set `BASE_PATH=/` when
+building for a host that serves from the root.
 
 CI does not rerun the data pipeline, because of the 862 MB download. It uses the committed data files.
 
