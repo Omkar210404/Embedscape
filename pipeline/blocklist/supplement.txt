@@ -1,0 +1,12 @@
+# embedscape supplement to ldnoobw-en.txt
+# Slurs whose dominant use is as a slur and which ldnoobw-en.txt does not contain.
+# Matching is exact token (plus simple plurals), see embedscape_pipeline/filters.py.
+# See README.md in this folder for the terms deliberately NOT listed and why.
+chink
+gook
+jap
+kraut
+honky
+retard
+retarded
+dyke
