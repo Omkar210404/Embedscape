@@ -9,7 +9,7 @@ import numpy as np
 import pytest
 
 from build_data import build
-from embedscape_pipeline import calibrate, clusters, export, filters, quantize
+from embedscape_pipeline import calibrate, clusters, export, filters, layout, quantize
 from embedscape_pipeline.download import parse_glove_lines
 
 
@@ -106,6 +106,16 @@ def test_binary_round_trip():
     assert np.array_equal(pos, p2) and np.array_equal(labels, l2)
 
 
+# ---------- globe layout ----------
+
+def test_sphere_to_xyz_puts_points_on_the_sphere():
+    angles = np.random.default_rng(5).normal(scale=4.0, size=(100, 2))  # includes wrapped angles
+    xyz = layout.sphere_to_xyz(angles, radius=50.0)
+    assert np.allclose(np.linalg.norm(xyz, axis=1), 50.0, atol=1e-4)
+    # theta = 0 is the north pole whatever phi is
+    assert np.allclose(layout.sphere_to_xyz(np.array([[0.0, 1.3]]), 1.0), [[0, 0, 1]], atol=1e-6)
+
+
 # ---------- clusters and calibration ----------
 
 def test_cluster_names_are_most_central_members():
@@ -149,7 +159,8 @@ def test_build_is_deterministic_and_well_formed():
 
     assert len(a["vectors.bin"]) == 200 * 4 + 200 * 16
     pos, labels = export.read_layout(a["layout.bin"], 200)
-    assert np.isclose(np.linalg.norm(pos, axis=1).max(), 50.0, atol=1e-3)
+    # Every word sits on the globe's surface.
+    assert np.allclose(np.linalg.norm(pos, axis=1), 50.0, atol=1e-3)
     assert set(labels.tolist()) == {0, 1, 2, 3}
     vocab = a["vocab"]
     assert vocab["count"] == 200 and vocab["dims"] == 16 and len(vocab["clusters"]) == 4

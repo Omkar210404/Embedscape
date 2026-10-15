@@ -44,7 +44,7 @@ def build(rows, n_words: int, k: int, seed: int, blocklist: set[str], scan_ks: l
     calib = calibrate.calibrate(browser_unit)
 
     t = time.perf_counter()
-    pos = layout.fit_to_scene(layout.umap_3d(unit, seed))
+    pos = layout.sphere_to_xyz(layout.umap_sphere(unit, seed))
     timings["umap_s"] = time.perf_counter() - t
 
     t = time.perf_counter()
@@ -67,7 +67,7 @@ def build(rows, n_words: int, k: int, seed: int, blocklist: set[str], scan_ks: l
             "licence": "ODC Public Domain Dedication and License (PDDL) v1.0",
             "licence_url": "https://opendatacommons.org/licenses/pddl/1-0/",
         },
-        "layout": {"method": "UMAP", **layout.UMAP_PARAMS, "random_state": seed},
+        "layout": {"method": "UMAP onto a sphere", **layout.UMAP_PARAMS, "random_state": seed, "radius": layout.GLOBE_RADIUS},
         "kmeans": {"k": k, "n_init": 10, "random_state": seed},
     }
     stats = {

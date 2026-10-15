@@ -70,10 +70,10 @@
     ]
   },
   "timings_seconds": {
-    "select_s": 0.2,
-    "quantise_report_s": 1.54,
-    "umap_s": 438.35,
-    "kmeans_s": 10.34
+    "select_s": 0.09,
+    "quantise_report_s": 0.83,
+    "umap_s": 55.56,
+    "kmeans_s": 3.29
   },
   "output_files": {
     "vectors.bin": {
@@ -82,11 +82,11 @@
     },
     "layout.bin": {
       "bytes": 65000,
-      "sha256": "d3b7fdd7210995c68961051de071f369d8b162e15de6455dfa0f11d98487de4a"
+      "sha256": "02d3a6b0d9428e5d8c3a9f586bddee72474f0ffc85e9688f6b52498372326012"
     },
     "vocab.json": {
-      "bytes": 53814,
-      "sha256": "3ad004dfcb3dd84102b98e04e4dab7e7d80dc107e7ff9165801193bb04a067a9"
+      "bytes": 53870,
+      "sha256": "a0d8a9762d1a7c91479f82ae3a631a65a9bf9b53ed155365264e79ce3ac3bbd0"
     }
   },
   "environment": {
