@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Walk through the meaning of words: an interactive 3D map of 5,000 English words and how a language model places them." />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="color-scheme" content="dark" />
+    <title>embedscape: walk through the meaning of words</title>
+    <link rel="icon" href="data:," />
+  </head>
+  <body>
+    <header class="brand">
+      <h1>embedscape</h1>
+      <p>Walk through the meaning of words.</p>
+    </header>
+
+    <main id="scene" class="scene" aria-label="3D word map"></main>
+
+    <aside class="panel" aria-label="Explore words">
+      <button id="sheet-toggle" class="sheet-toggle" type="button" aria-label="Show or hide the panel"></button>
+      <div id="tabs" class="tabs" role="tablist" aria-label="Tools"></div>
+      <div id="panel-body" class="panel-body"></div>
+    </aside>
+
+    <footer class="honesty">
+      <details class="legend">
+        <summary>Clusters</summary>
+        <ol id="legend-list" class="legend-list"></ol>
+      </details>
+      <p>The 3D layout is a lossy projection of 50-dimensional vectors. Every score uses the original vectors.</p>
+    </footer>
+
+    <div id="tooltip" class="tooltip" hidden></div>
+
+    <div id="loading" class="loading" role="status">
+      <p>Loading 5,000 words…</p>
+    </div>
+
+    <noscript><p class="noscript">embedscape needs JavaScript to run. Nothing is tracked.</p></noscript>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
