@@ -1,0 +1,100 @@
+{
+  "source": {
+    "url": "https://downloads.cs.stanford.edu/nlp/data/glove.6B.zip",
+    "member": "glove.6B.50d.txt",
+    "zip_sha256": "617afb2fe6cbd085c235baf7a465b96f4112bd7f7ccb2b2cbd649fed9cbcf2fb"
+  },
+  "params": {
+    "n_words": 5000,
+    "k": 20,
+    "seed": 42
+  },
+  "vocabulary": {
+    "words_kept": 5000,
+    "rows_examined": 5661,
+    "removed_by_rule": {
+      "not_alphabetic": 330,
+      "too_short": 93,
+      "stop_word": 234,
+      "blocklisted": 4
+    },
+    "last_kept_word": "nicolas",
+    "blocklist_entries_single_token": 287
+  },
+  "quantisation": {
+    "scheme": "symmetric per-vector int8 on L2-normalised vectors",
+    "component_abs_error_max": 0.003226807340979576,
+    "component_abs_error_mean": 0.0009323133272118866,
+    "cosine_abs_error_max": 0.00832030177116394,
+    "cosine_abs_error_mean": 0.0011205649934709072,
+    "top10_neighbour_overlap_mean": 0.9875400000000002,
+    "top10_neighbour_lists_identical_fraction": 0.4962
+  },
+  "calibration_thresholds": {
+    "very_close": 0.8507964611053467,
+    "related": 0.6876972317695618,
+    "loosely_related": 0.5128312706947327
+  },
+  "random_pair_cosine_mean": 0.29666662216186523,
+  "clusters": {
+    "k": 20,
+    "silhouette_cosine_by_k": {
+      "8": 0.09389518946409225,
+      "12": 0.10021976381540298,
+      "16": 0.10134410858154297,
+      "20": 0.10800009965896606,
+      "24": 0.11182296276092529,
+      "32": 0.10379165410995483
+    },
+    "sizes": [
+      206,
+      285,
+      225,
+      208,
+      269,
+      216,
+      240,
+      213,
+      241,
+      241,
+      378,
+      180,
+      410,
+      290,
+      274,
+      123,
+      286,
+      236,
+      272,
+      207
+    ]
+  },
+  "timings_seconds": {
+    "select_s": 0.2,
+    "quantise_report_s": 1.54,
+    "umap_s": 438.35,
+    "kmeans_s": 10.34
+  },
+  "output_files": {
+    "vectors.bin": {
+      "bytes": 270000,
+      "sha256": "12ff8c1737a1ed1eef108cec02ab32471213b8591456ea742628e459b6fd0643"
+    },
+    "layout.bin": {
+      "bytes": 65000,
+      "sha256": "d3b7fdd7210995c68961051de071f369d8b162e15de6455dfa0f11d98487de4a"
+    },
+    "vocab.json": {
+      "bytes": 53814,
+      "sha256": "3ad004dfcb3dd84102b98e04e4dab7e7d80dc107e7ff9165801193bb04a067a9"
+    }
+  },
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "numpy": "2.4.6",
+    "scikit-learn": "1.9.1",
+    "umap-learn": "0.5.12",
+    "numba": "0.68.0"
+  }
+}
