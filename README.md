@@ -2,18 +2,23 @@
 
 **Walk through the meaning of words.**
 
-An interactive 3D map of 5,000 common English words, where words with similar meanings sit near each
-other. Search a word and fly to it, see its nearest neighbours, compare two words, and try word
-analogies. The goal is to make *embeddings*, the idea behind modern AI search, something you can see
-and poke at. It is also honest about what they get wrong.
+A 3D globe of 5,000 common English words, laid out so that words with similar meanings sit near each
+other and form "continents" of meaning. You can spin the globe, search a word and fly to it, see its
+nearest neighbours, compare two words and try word arithmetic. A guided tour explains it all in about a
+minute. The aim is to make *embeddings*, the idea behind modern AI search, something a non-expert can
+see and explore, and to be honest about what they get wrong.
 
 It is a static site: no backend, no API keys, no tracking. Everything runs in the browser.
 
-![Exploring the word "ocean": the 10 nearest neighbours are labelled in the 3D map and listed with cosine scores in the side panel](docs/screenshots/explore-ocean.png)
+![The globe overview: coloured continents of related words, each named after its most typical words](docs/screenshots/overview.png)
 
-| Compare (opposites score high) | Analogy (a preset that shows learned bias) | Phone |
-|---|---|---|
-| ![Compare panel: good and bad score 0.796, "related"](docs/screenshots/compare.png) | ![Analogy panel: doctor − man + woman returns child, pregnant, patient](docs/screenshots/analogy-bias.png) | ![Phone layout with the panel as a bottom sheet](docs/screenshots/phone.png) |
+| A plain-English welcome | The guided tour (king − man + woman) |
+|---|---|
+| ![Welcome dialog: every dot is a word, close dots have similar meanings](docs/screenshots/intro.png) | ![Tour step 4: king − man + woman lands on queen, shown with arcs on the globe](docs/screenshots/tour-analogy.png) |
+
+| Exploring "ocean" | Compare (opposites score high) | Word maths showing learned bias | Phone |
+|---|---|---|---|
+| ![The word ocean with arcs to its 10 nearest neighbours](docs/screenshots/explore-ocean.png) | ![good and bad score 0.796, "related"](docs/screenshots/compare.png) | ![doctor − man + woman returns child, pregnant, patient](docs/screenshots/analogy-bias.png) | ![Phone layout with the details card as a bottom sheet](docs/screenshots/phone.png) |
 
 *Screenshots are real captures of the production build, made by `e2e/screenshots.spec.ts`.*
 
@@ -21,25 +26,32 @@ It is a static site: no backend, no API keys, no tracking. Everything runs in th
 
 ## Features
 
-- **3D word map.** 5,000 words drawn as points in one WebGL draw call, with a soft depth fog. You can
-  orbit, zoom and use touch. Points are coloured by cluster. Only the focused word and its neighbours get
-  labels, and labels that would overlap are nudged apart.
-- **Search with autocomplete.** An accessible combobox: arrow keys, Enter, and `/` to focus it. Picking a
-  word flies the camera to it, lists its **10 nearest neighbours with cosine scores** and draws lines to
-  them. Deep links work, for example `#word=ocean`.
-- **Projection check.** For every word, the panel says how many of its 10 true neighbours are also among the
-  10 closest points *in 3D*. This shows directly that the picture loses information.
-- **Compare two words.** The panel shows the cosine score, a plain-English reading (very close, related,
+- **Explains itself.** A first-visit welcome says what embeddings are in three plain steps. A one-minute
+  **guided tour** flies the camera through the core ideas: similar words live together, closeness is a
+  number, you can do maths with meaning, and the model learned our biases. Every number in the tour is
+  computed live from the data.
+- **The word globe.** 5,000 glowing words on a sphere.
+  - The coloured "continents" are a density map of where each group's words actually sit, and each
+    group's name floats over its most central word.
+  - Drag or use the arrow / W A S D keys to spin, and scroll or Q / E to zoom.
+  - As you get close to the surface, nearby words label themselves.
+  - Words on the far side are hidden, and the camera flies over the curve of the globe.
+- **Search with autocomplete.** Picking a word flies to it, lists its **10 nearest neighbours with cosine
+  scores** and draws them as arcs over the globe. It is an accessible combobox (arrow keys, Enter, `/`
+  to focus). Deep links work, for example `#word=ocean`.
+- **Projection check.** For every word, the card says how many of its 10 true neighbours are also among its
+  10 closest dots on the globe. This shows directly that the picture loses information.
+- **Compare two words.** The card shows the cosine score, a plain-English reading (very close, related,
   loosely related or unrelated) and "more similar than X% of word pairs". Thresholds are **measured from
   this vocabulary**, not invented.
-- **Analogy playground.** `A − B + C = ?` shows the top 5 results, excluding the inputs, with scores. Eight
-  presets are included, and every one is checked by a test. Five work, two fail, and one shows learned
-  gender bias. The panel also says what the answer would be *without* excluding the inputs, which is
-  often just one of the inputs.
-- **About panel.** Explains what embeddings are, how to read the map, measured build numbers, limits,
-  and credits.
-- Works without WebGL: the 3D view is hidden, and every number and panel still works, because none of
-  them depend on it.
+- **Word maths.** `A − B + C = ?` shows the top 5 results, excluding the inputs, with scores.
+  - Eight presets are included, each checked by a test: five work, two fail, and one shows learned
+    gender bias.
+  - The card also says what the answer would be *without* excluding the inputs, which is often just one
+    of the inputs.
+- **Method & limits** dialog: how it was built, measured numbers, limits and credits.
+- Works without WebGL: the globe is hidden, and every number and panel still works, because none of them
+  depend on it.
 
 ## How it works
 
@@ -49,13 +61,13 @@ flowchart LR
     G["GloVe 6B 50d<br/>862 MB zip, cached, SHA-256 checked"] --> F["Filter in frequency order<br/>first 5,000 words that pass"]
     F --> N["L2-normalise"]
     N --> Q["int8 quantise<br/>+ measure error"]
-    N --> U["UMAP 50d → 3D<br/>random_state=42"]
+    N --> U["UMAP onto a sphere<br/>haversine output, random_state=42"]
     N --> K["k-means, k=20<br/>name = 3 most central words"]
     Q --> C["Calibrate score readings<br/>from all 12.5M word pairs"]
   end
   subgraph static["public/data (committed, 389 KB)"]
     V["vectors.bin<br/>int8 vectors + scales"]
-    L["layout.bin<br/>3D positions + cluster ids"]
+    L["layout.bin<br/>globe positions + cluster ids"]
     J["vocab.json<br/>words, clusters, thresholds"]
   end
   Q --> V
@@ -65,8 +77,8 @@ flowchart LR
   C --> J
   subgraph browser["Browser (TypeScript)"]
     M["src/math<br/>cosine · top-k · analogy<br/>on the 50-d vectors"]
-    S["src/scene<br/>three.js points, labels, lines"]
-    P["src/ui<br/>search · compare · analogy"]
+    S["src/scene<br/>three.js globe, points, arcs, labels"]
+    P["src/ui<br/>search · compare · word maths · tour"]
   end
   V --> M
   L --> S
@@ -76,9 +88,12 @@ flowchart LR
 ```
 
 **The key rule:** every similarity, neighbour and analogy result is computed on the **original
-50-dimensional vectors**, never on the 3D positions. The 3D layout is only a picture. UMAP keeps local
-neighbourhoods roughly intact but distorts long distances, and the site says so in a note that is
-always visible.
+50-dimensional vectors**, never on the globe positions. The globe is only a picture.
+
+UMAP's haversine output metric places the words directly on the surface of a sphere, rather than
+squashing a flat map onto one afterwards. Close neighbourhoods stay roughly intact, while long
+distances, where a continent sits, and the latitude and longitude lines mean nothing. The site says so
+in a note that is always visible.
 
 ## Data and licences
 
@@ -116,7 +131,7 @@ in [pipeline/blocklist/README.md](pipeline/blocklist/README.md).
 
 ## Measured numbers
 
-All values come from [`pipeline/stats.json`](pipeline/stats.json), written by the build.
+Unless noted, values come from [`pipeline/stats.json`](pipeline/stats.json), written by the build.
 
 **Quantisation** (symmetric per-vector int8 on unit vectors, re-normalised in the browser):
 
@@ -140,6 +155,20 @@ All values come from [`pipeline/stats.json`](pipeline/stats.json), written by th
 The *average* random pair already scores **0.297**, which is why raw cosine numbers mislead without
 calibration.
 
+**How faithful is the globe?** For each word, the test counts how many of its 10 true neighbours (in 50
+dimensions) are also among its 10 closest dots in the picture, then averages over all 5,000 words. This
+was a side-by-side test run during development; the shipped value was re-measured on the committed data.
+
+| Layout | Mean overlap (out of 10) |
+|---|---:|
+| Free 3D point cloud (UMAP, 3 components), an earlier version | 3.52 |
+| Globe with UMAP's default spacing (`min_dist=0.1`, 15 neighbours) | 1.33 |
+| **Globe as shipped** (`min_dist=0`, 10 neighbours) | **2.08** |
+
+The globe is an honest trade-off: a sphere's surface is effectively 2D, so it keeps fewer true neighbours
+together than a free 3D cloud. Tighter UMAP settings recovered most of the gap. This is why every number
+on the site comes from the 50-d vectors, and why the per-word count is shown.
+
 **Clusters:** the cosine silhouette score is low at every k tried (8: 0.094, 12: 0.100, 16: 0.101,
 20: 0.108, 24: 0.112, 32: 0.104). Word meaning does not form clean groups, and the clusters are soft. k=20 was
 chosen over the marginally higher 24 so the colours stay distinguishable.
@@ -148,19 +177,19 @@ chosen over the marginally higher 24 so the colours stay distinguishable.
 
 | File | Raw | gzip -9 |
 |---|---:|---:|
-| JavaScript (almost all three.js) | 586 KB | 147 KB |
+| JavaScript (almost all three.js) | 609 KB | 154 KB |
 | `vectors.bin` | 270 KB | 245 KB |
 | `layout.bin` | 65 KB | 60 KB |
 | `vocab.json` | 54 KB | 21 KB |
-| CSS + HTML | 11 KB | 4 KB |
-| **Total** | **985 KB** | **477 KB** |
+| CSS + HTML | 20 KB | 6 KB |
+| **Total** | **1,018 KB** | **486 KB** |
 
 The quantised vectors barely compress, because they are close to random bytes. The actual transfer
-depends on the host's compression.
+depends on the host's compression. The globe's coloured surface is drawn in the browser from the word
+positions, so it adds no download.
 
-**Reproducibility:** three full builds on the same machine produced byte-identical `vectors.bin` and
-`layout.bin`. UMAP output can still differ across operating systems or library versions, which is why
-the versions used are pinned and recorded in `stats.json`.
+**Reproducibility:** two full builds of the globe on the same machine produced byte-identical `vectors.bin`, `layout.bin` and `vocab.json`. UMAP output can still differ across operating systems or library
+versions, which is why the versions used are pinned and recorded in `stats.json`.
 
 ## Run it locally
 
@@ -190,20 +219,21 @@ pip install -r requirements-dev.txt
 python build_data.py                 # downloads ~862 MB once, then writes ../public/data and stats.json
 ```
 
-On Windows, keep the venv at a short path such as `pipeline/.venv`. scikit-learn ships deeply nested files that can exceed the 260-character path limit.
+On Windows, keep the venv at a short path such as `pipeline/.venv`. scikit-learn ships deeply nested files
+that can exceed the 260-character path limit.
 
-Options: `--n-words`, `--k`, `--seed`, `--no-silhouette-scan`. A full build took roughly 2 to 8 minutes
-on a laptop CPU, almost all of it UMAP. The time varied with machine load.
+Options: `--n-words`, `--k`, `--seed`, `--no-silhouette-scan`. After the download, a full build took
+1 to 2 minutes on a laptop CPU, most of it UMAP. The first run is slower, while numba compiles.
 
 ## Tests
 
 | Suite | Command | What it covers |
 |---|---|---|
-| Pipeline (pytest, 23 tests) | `cd pipeline && pytest` | Filter rules, blocklist matching, quantisation error bound, binary round-trip, cluster naming rule, threshold ordering, end-to-end determinism. Uses synthetic data and never downloads. |
-| Front end (Vitest, 28 tests) | `npm test` | Cosine, top-k against brute force, analogy exclusion, score readings, percentile, autocomplete, binary decoding, colours. **Also every claim in the preset notes, checked against the shipped data.** |
-| Smoke (Playwright, 3 tests) | `npx playwright test` | Builds and serves the production site. Then checks the CSP is present, WebGL starts, search → 10 neighbours, compare, analogy, the About credits, a deep link, no sideways scroll on a phone, and no console errors or CSP violations. A third test turns WebGL off and checks that the panels still work. |
+| Pipeline (pytest, 24 tests) | `cd pipeline && pytest` | Filter rules, blocklist matching, quantisation error bound, binary round-trip, globe mapping, cluster naming rule, threshold ordering, end-to-end determinism. Uses synthetic data and never downloads. |
+| Front end (Vitest, 29 tests) | `npm test` | Cosine, top-k against brute force, analogy exclusion, score readings, percentile, autocomplete, binary decoding, colours. **Also every claim in the preset notes, checked against the shipped data,** and that every word sits on the globe. |
+| Browser (Playwright, 4 tests) | `npx playwright test` | Builds and serves the production site. Checks the welcome dialog and the full tour, the CSP, WebGL, search → 10 neighbours, compare, word maths, the Method & limits credits, a deep link, no sideways scroll on a phone, and no console errors or CSP violations. One test turns WebGL off and checks that the panels still work. |
 
-Run `npx playwright install chromium` once before the smoke tests.
+Run `npx playwright install chromium` once before the browser tests.
 `SCREENSHOTS=1 npx playwright test screenshots` regenerates the README screenshots.
 
 ## Deploy
@@ -219,8 +249,9 @@ CI does not rerun the data pipeline, because of the 862 MB download. It uses the
 
 - A Content-Security-Policy meta tag is added to production builds:
   `default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'`.
-  The smoke test fails on any CSP violation.
+  The browser tests fail on any CSP violation.
 - No external requests at runtime, no cookies, no analytics. What you type never leaves the page.
+  `localStorage` only remembers that you have seen the welcome dialog.
 - User-visible text is set with `textContent`, never `innerHTML`.
 - There are no secrets, so there is no `.env` or `.env.example`.
 
@@ -231,21 +262,21 @@ CI does not rerun the data pipeline, because of the 862 MB download. It uses the
 - **Bias.** The vectors learned from 2014 Wikipedia and news text and carry its stereotypes. The site
   shows one case (`doctor − man + woman`) and does not try to hide or "fix" it.
 - **Analogies are fragile.** Several classic ones work, but many fail, as two presets show. Excluding the
-  input words, which is standard practice, makes results look better than they are; the panel shows this.
+  input words, which is standard practice, makes results look better than they are; the card shows this.
 - **One vector per word.** Senses are mixed together, so *bank* (river) and *bank* (money) are one point.
 - **Small, old model.** 50 dimensions, a 400k vocabulary trained in 2014, and only the 5,000 most common
   filtered words shown. Rare words, names outside the top rows, and words under 3 letters are missing.
   Modern embedding models are much larger and context-aware. This one was chosen because it is openly
   licensed and small enough to explore in a browser.
-- **The 3D layout distorts.** Long distances and cluster positions in the picture mean little. For a
-  typical word only some of its true neighbours are also its nearest neighbours in 3D, and the panel
-  reports the exact count.
+- **The globe distorts.** On average only about 2 of a word's 10 true neighbours are also its closest
+  dots on the globe (see the table above). Where a continent sits, and the distance between continents,
+  mean nothing. The card reports the exact count for each word.
 - **Cluster names** come from a mechanical rule (the 3 most central words), so some read oddly, such as
   "area · located · near". That is the honest result of the rule.
 - **The blocklist is not complete.** Exact matching cannot catch context, misspellings or new slurs.
 - **Accessibility.** Search and tabs follow the standard ARIA combobox and tabs patterns and work from the
-  keyboard. They have not been tested with a real screen reader. The 3D map itself is visual, but
-  everything it shows is also available as text in the panels.
+  keyboard. They have not been tested with a real screen reader. The globe itself is visual, but
+  everything it shows is also available as text in the cards.
 
 ## Project structure
 
@@ -253,16 +284,16 @@ CI does not rerun the data pipeline, because of the 862 MB download. It uses the
 src/
   data/load.ts        decode vectors.bin / layout.bin / vocab.json
   math/               vectors (cosine, top-k, analogy), compare, search, projection, colours
-  scene/              three.js explorer (points shader, camera flight, labels, lines)
-  ui/                 combobox and the four panels
+  scene/              three.js globe: points shader, continent texture, arcs, labels, camera flights
+  ui/                 combobox, explore / compare / word-maths cards, guided tour, method dialog
   presets.ts          preset examples (claims verified by tests/realData.test.ts)
 tests/                Vitest unit tests and real-data tests
-e2e/                  Playwright smoke test and screenshot capture
+e2e/                  Playwright browser tests and screenshot capture
 pipeline/
   build_data.py       entry point
-  embedscape_pipeline/ download, filters, quantize, layout, clusters, calibrate, export
+  embedscape_pipeline/ download, filters, quantize, layout (globe), clusters, calibrate, export
   blocklist/          LDNOOBW list, supplement, policy README
-  stats.json          every measured number quoted above
+  stats.json          the measured numbers quoted above
   tests/              pytest
 public/data/          the generated files the site loads
 ```

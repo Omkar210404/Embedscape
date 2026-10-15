@@ -223,3 +223,26 @@ Commits are small and meaningful. Nothing is pushed or published to GitHub until
 - **No-WebGL fallback** gets its own Playwright test.
 - **Camera view offset:** the 3D view centres in the part of the screen the panel does not cover.
 - **Label placement:** labels nudge apart instead of overlapping.
+
+## 11. Redesign after the first review (2026-10-15)
+
+Feedback: the first UI felt basic, the 3D view did not feel spatial, and it was not clear what the site
+is for. Then: "make it a globe".
+
+- **Explain first.** A welcome dialog sets out the idea in three plain steps, and a 6-step guided tour
+  drives the real camera and cards. Every number in the tour is computed live from the data.
+- **Globe layout.** UMAP with `output_metric="haversine"` places the words on a sphere directly, so it is
+  not a 3D cloud squashed onto one afterwards. I compared settings on mean top-10 neighbour overlap:
+  - free 3D: 3.52
+  - globe with default spacing: 1.33
+  - globe with `min_dist=0` and `n_neighbors=10`: 2.15 in the test; 2.08 on the shipped data
+
+  The globe ships with the last setting. The README reports the trade-off.
+- **Spatial look.**
+  - Glowing points, a density-map "continent" texture drawn from the real word positions, and a soft
+    atmosphere.
+  - Arcs over the surface, labels for words near the camera, and group names floating over each
+    group's most central word.
+  - Flights over the curve of the globe, and a fly-in on load.
+- **Layout.** The scene fills the screen, search sits in a floating bar, results appear in a floating card
+  only when needed, and labels never draw under the UI.
