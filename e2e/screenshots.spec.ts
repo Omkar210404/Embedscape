@@ -7,32 +7,42 @@ test.skip(!process.env.SCREENSHOTS, "set SCREENSHOTS=1 to capture README screens
 
 const OUT = "docs/screenshots";
 
-async function ready(page: Page, path = "") {
+async function ready(page: Page, path = "", seenIntro = true) {
+  await page.addInitScript((seen) => seen && localStorage.setItem("embedscape.seenIntro", "1"), seenIntro);
   await page.goto(path);
   await expect(page.locator("body")).toHaveAttribute("data-ready", "true");
 }
 
-// Let the camera flight (1.2 s) and fades settle before capturing.
-const settle = (page: Page) => page.waitForTimeout(2200);
+// Let camera flights and fades settle before capturing.
+const settle = (page: Page, ms = 2200) => page.waitForTimeout(ms);
 
 test("desktop screenshots", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.emulateMedia({ reducedMotion: "no-preference" });
 
-  await ready(page);
-  await page.waitForTimeout(1500);
+  await ready(page, "", false);
+  await settle(page, 4200); // intro fly-in
+  await page.screenshot({ path: `${OUT}/intro.png` });
+  await page.getByRole("button", { name: "Explore on my own" }).click();
+  await settle(page, 600);
   await page.screenshot({ path: `${OUT}/overview.png` });
 
-  await ready(page, "#word=ocean");
+  await page.getByRole("button", { name: "Take the tour" }).click();
+  for (let i = 0; i < 3; i++) await page.getByRole("button", { name: "Next" }).click();
+  await settle(page);
+  await page.screenshot({ path: `${OUT}/tour-analogy.png` });
+  await page.getByRole("button", { name: "End tour" }).click();
+
+  await page.getByRole("combobox", { name: "Search a word" }).fill("ocean");
+  await page.getByRole("combobox", { name: "Search a word" }).press("Enter");
   await settle(page);
   await page.screenshot({ path: `${OUT}/explore-ocean.png` });
 
-  await page.getByRole("tab", { name: "Compare" }).click();
+  await page.getByRole("tab", { name: "Compare two words" }).click();
   await page.getByRole("button", { name: "good / bad" }).click();
   await settle(page);
   await page.screenshot({ path: `${OUT}/compare.png` });
 
-  await page.getByRole("tab", { name: "Analogy" }).click();
+  await page.getByRole("tab", { name: "Word maths" }).click();
   await page.getByRole("button", { name: /doctor − man \+ woman/ }).click();
   await settle(page);
   await page.screenshot({ path: `${OUT}/analogy-bias.png` });
