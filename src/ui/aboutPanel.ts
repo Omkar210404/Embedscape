@@ -18,13 +18,13 @@ export function aboutPanel(data: Dataset): HTMLElement {
     el("h2", { text: "How to read the map" }),
     el("ul", {}, [
       el("li", {
-        text: `The 3D layout is a lossy projection. UMAP squeezes ${vocab.dims} dimensions into 3, keeping close neighbourhoods roughly intact and distorting long distances. Do not read much into how far apart two clusters look.`,
+        text: `The globe is a lossy picture. UMAP lays the ${vocab.dims}-dimensional vectors out on the surface of a sphere, keeping close neighbourhoods roughly intact and distorting long distances. Where a group sits on the globe, and the latitude and longitude lines, mean nothing; only closeness does.`,
       }),
       el("li", {
-        text: `Every score on this site (neighbours, compare, analogies) is computed on the original ${vocab.dims}-dimensional vectors, never on the 3D positions.`,
+        text: `Every score on this site (neighbours, compare, analogies) is computed on the original ${vocab.dims}-dimensional vectors, never on the globe positions.`,
       }),
       el("li", {
-        text: `Colours are ${vocab.kmeans.k} k-means clusters, found on the original vectors. Each cluster is named after the 3 words closest to its centre. Nobody hand-wrote these labels. The clusters are soft: the cosine silhouette score is only ${(b.clusters.silhouette_cosine_by_k[String(vocab.kmeans.k)] ?? 0).toFixed(3)}, so many words sit between clusters.`,
+        text: `Colours are ${vocab.kmeans.k} k-means clusters, found on the original vectors. The glowing “continents” are simply where each group's words sit. Each cluster is named after the 3 words closest to its centre. Nobody hand-wrote these labels. The clusters are soft: the cosine silhouette score is only ${(b.clusters.silhouette_cosine_by_k[String(vocab.kmeans.k)] ?? 0).toFixed(3)}, so many words sit between clusters.`,
       }),
     ]),
 

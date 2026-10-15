@@ -3,35 +3,77 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Walk through the meaning of words: an interactive 3D map of 5,000 English words and how a language model places them." />
+    <meta name="description" content="Walk through the meaning of words: spin a globe of 5,000 English words and see how an AI model places them." />
     <meta name="referrer" content="no-referrer" />
     <meta name="color-scheme" content="dark" />
     <title>embedscape: walk through the meaning of words</title>
     <link rel="icon" href="data:," />
   </head>
   <body>
-    <header class="brand">
-      <h1>embedscape</h1>
-      <p>Walk through the meaning of words.</p>
+    <main id="scene" class="scene" aria-label="Globe of word meanings"></main>
+
+    <header class="topbar">
+      <div class="brand">
+        <h1>embedscape</h1>
+        <p>Walk through the meaning of words</p>
+      </div>
+
+      <div class="command">
+        <div id="search-slot" class="search-slot"></div>
+        <div id="modes" class="modes" role="tablist" aria-label="Tools"></div>
+        <p id="search-status" class="search-status" role="status" aria-live="polite"></p>
+        <div id="suggestions" class="suggestions"></div>
+      </div>
+
+      <nav class="top-actions" aria-label="Help">
+        <button id="what-btn" class="btn ghost" type="button">What is this?</button>
+        <button id="tour-btn" class="btn primary" type="button">Take the tour</button>
+      </nav>
     </header>
 
-    <main id="scene" class="scene" aria-label="3D word map"></main>
-
-    <aside class="panel" aria-label="Explore words">
-      <button id="sheet-toggle" class="sheet-toggle" type="button" aria-label="Show or hide the panel"></button>
-      <div id="tabs" class="tabs" role="tablist" aria-label="Tools"></div>
-      <div id="panel-body" class="panel-body"></div>
+    <aside id="card" class="card" aria-label="Details" hidden>
+      <button id="card-close" class="icon-btn card-close" type="button" aria-label="Close">×</button>
+      <div id="card-body" class="card-body"></div>
     </aside>
 
-    <footer class="honesty">
-      <details class="legend">
-        <summary>Clusters</summary>
-        <ol id="legend-list" class="legend-list"></ol>
-      </details>
-      <p>The 3D layout is a lossy projection of 50-dimensional vectors. Every score uses the original vectors.</p>
+    <div id="tour-slot"></div>
+
+    <footer class="hud">
+      <div class="hud-left">
+        <details class="legend">
+          <summary>Word groups</summary>
+          <ol id="legend-list" class="legend-list"></ol>
+        </details>
+        <p class="honesty">
+          The globe is a flattened picture of 50 dimensions. Every score uses the full vectors.
+          <button id="limits-btn" class="link-btn" type="button">Method &amp; limits</button>
+        </p>
+      </div>
+      <p class="hint hint-mouse">Drag to spin · Scroll to zoom · <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> to turn · Click a dot</p>
+      <p class="hint hint-touch">Drag to spin · Pinch to zoom · Tap a dot</p>
     </footer>
 
     <div id="tooltip" class="tooltip" hidden></div>
+
+    <dialog id="intro" class="dialog intro" aria-labelledby="intro-title">
+      <p class="kicker">An interactive map of how AI sees words</p>
+      <h2 id="intro-title">Every dot is a word. Close dots have similar meanings.</h2>
+      <ol class="intro-steps">
+        <li><strong>Words become numbers.</strong> To a computer, each word is a list of numbers, called an <em>embedding</em>. Here every word has 50 of them.</li>
+        <li><strong>Similar use, similar numbers.</strong> The numbers were learned from billions of sentences, so words used in similar ways get similar numbers.</li>
+        <li><strong>They become a globe.</strong> We laid the words out on a globe so that related words sit near each other, forming continents of meaning you can spin and zoom into.</li>
+      </ol>
+      <p class="intro-why">This is the same idea that lets modern AI search find things by meaning instead of exact keywords.</p>
+      <div class="dialog-actions">
+        <button id="intro-explore" class="btn ghost" type="button">Explore on my own</button>
+        <button id="intro-tour" class="btn primary" type="button">Take the 1-minute tour</button>
+      </div>
+    </dialog>
+
+    <dialog id="about" class="dialog about" aria-label="Method and limits">
+      <button id="about-close" class="icon-btn card-close" type="button" aria-label="Close">×</button>
+      <div id="about-body"></div>
+    </dialog>
 
     <div id="loading" class="loading" role="status">
       <p>Loading 5,000 words…</p>

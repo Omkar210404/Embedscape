@@ -63,6 +63,8 @@ export class ComparePanel {
     const pct = pairPercentile(score, cal.pair_quantiles);
     const preset = COMPARE_PRESETS.find((p) => p.a === data.words[a] && p.b === data.words[b]);
 
+    // Presets sit below the result, so bring the new result into view.
+    this.root.closest(".card")?.scrollTo({ top: 0 });
     this.result.replaceChildren(
       el("div", { class: "big-score" }, [
         el("span", { class: "big-number", text: fmt(score) }),

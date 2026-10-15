@@ -61,4 +61,4 @@ export const COMPARE_PRESETS: ComparePreset[] = [
   { a: "computer", b: "river" },
 ];
 
-export const EXPLORE_SUGGESTIONS = ["ocean", "music", "coffee", "king", "computer", "happy"];
+export const EXPLORE_SUGGESTIONS = ["ocean", "music", "coffee", "computer", "france", "king"];

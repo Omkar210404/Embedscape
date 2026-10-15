@@ -5,6 +5,8 @@ export interface ComboboxOptions {
   words: readonly string[];
   label: string;
   placeholder?: string;
+  /** Keep the label for screen readers but hide it visually. */
+  hideLabel?: boolean;
   /** Called with a vocabulary index once the user picks a word. */
   onSelect(index: number): void;
   /** Called when the user submits text that is not in the vocabulary. */
@@ -40,7 +42,7 @@ export class Combobox {
     this.list = el("ul", { class: "combo-list", attrs: { id: listId, role: "listbox", "aria-label": opts.label } });
     this.list.hidden = true;
     this.root = el("div", { class: "combo" }, [
-      el("label", { class: "field-label", text: opts.label, attrs: { for: inputId } }),
+      el("label", { class: opts.hideLabel ? "sr-only" : "field-label", text: opts.label, attrs: { for: inputId } }),
       this.input,
       this.list,
     ]);

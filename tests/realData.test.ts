@@ -45,6 +45,13 @@ describe("shipped data", () => {
     expect(vocab.clusters).toHaveLength(vocab.kmeans.k);
   });
 
+  it("places every word on the globe's surface (radius 50, as the scene expects)", () => {
+    for (let i = 0; i < data.count; i++) {
+      const [x, y, z] = [data.positions[i * 3]!, data.positions[i * 3 + 1]!, data.positions[i * 3 + 2]!];
+      expect(Math.hypot(x, y, z)).toBeCloseTo(50, 3);
+    }
+  });
+
   it("contains no stop words, digits or short fragments", () => {
     for (const w of data.words) expect(w).toMatch(/^[a-z]{3,}$/);
     for (const w of ["the", "and", "with"]) expect(data.index.has(w)).toBe(false);

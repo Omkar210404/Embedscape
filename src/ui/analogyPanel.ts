@@ -75,6 +75,8 @@ export class AnalogyPanel {
     const preset = ANALOGY_PRESETS.find((p) => p.a === w(a) && p.b === w(b) && p.c === w(c));
     const inputWon = [a, b, c].includes(topIncludingInputs.index);
 
+    // Presets sit below the result, so bring the new result into view.
+    this.root.closest(".card")?.scrollTo({ top: 0 });
     this.result.replaceChildren(
       el("p", { class: "equation" }, [
         `${w(a)} − ${w(b)} + ${w(c)} ≈ `,
@@ -99,6 +101,10 @@ export class AnalogyPanel {
       preset ? el("p", { class: `callout callout-${preset.kind}`, text: preset.note }) : "",
       el("p", {
         class: "fine",
+        text: `On the globe the two arcs show ${w(b)} → ${w(a)} and ${w(c)} → ${w(hits[0]!.index)}. When an analogy works, these are parallel in the full 50-dimensional space; the globe can only hint at that.`,
+      }),
+      el("p", {
+        class: "fine",
         text:
           "Scores are cosine similarity to the vector A − B + C in the original 50 dimensions. The three input words are left out of the results, as is standard; " +
           (inputWon
@@ -106,6 +112,8 @@ export class AnalogyPanel {
             : "here the top answer is the same either way."),
       }),
     );
-    this.ctx.show([hits[0]!.index], [a, b, c, ...hits.slice(1).map((h) => h.index)], { lines: false });
+    // Lines show the two "directions" the analogy compares: B → A and C → answer.
+    const top = hits[0]!.index;
+    this.ctx.show([top], [a, b, c, ...hits.slice(1).map((h) => h.index)], { segments: [[b, a], [c, top]] });
   }
 }
