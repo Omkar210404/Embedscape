@@ -19,14 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----------------------------------------------------------------------------
-Third-party data (not covered by the MIT licence above):
-
-- public/data/* is derived from GloVe 6B word vectors by Jeffrey Pennington,
-  Richard Socher and Christopher D. Manning, made available under the Open Data
-  Commons Public Domain Dedication and License (PDDL) v1.0:
-  https://opendatacommons.org/licenses/pddl/1-0/
-- pipeline/blocklist/ldnoobw-en.txt is from the "List of Dirty, Naughty,
-  Obscene, and Otherwise Bad Words" project, licensed CC BY 4.0:
-  https://creativecommons.org/licenses/by/4.0/

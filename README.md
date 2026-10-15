@@ -301,5 +301,5 @@ public/data/          the generated files the site loads
 
 ## Licence
 
-Code: [MIT](LICENSE). Word vectors: GloVe, PDDL v1.0. Blocklist: LDNOOBW, CC BY 4.0. See [LICENSE](LICENSE)
-for the third-party notices.
+Code: [MIT](LICENSE). Word vectors: GloVe, PDDL v1.0. Blocklist: LDNOOBW, CC BY 4.0. See
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for details.
